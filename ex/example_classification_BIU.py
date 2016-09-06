@@ -4,17 +4,22 @@ from climatelearn.learning.classify import classification_train as train
 from climatelearn.learning.errors import confusion_matrix
 import pandas as pd
 
-path = "../data/NINO34_BIU.txt"
-nino_data = read.read_csv(path=path, sep='\t', date_key='date_time')
+
 path = "../data/DATA_BIU.txt"
 Net_BIU = read.read_csv(path, sep="\t", date_key='date_time')
 
+path = "../data/NINO34_BIU.txt"
+nino_data = read.read_csv(path=path, sep='\t', date_key='date_time')
 
 nino_data = nino_data.set_index(Net_BIU.index)
 raw_data = pd.concat([nino_data, Net_BIU], axis=1)
 
-data = features.classification_set(raw_data, 'NINO34', 1950.0, 1.0, 0.0)
 
+data = features.classification_set(raw_data, target_key='NINO34', t0=1950.0, horizon=1.0, deltat=0.0)
+
+print data
+
+exit()
 train_set = data[data.index < 1960]
 test_set = data[data.index >= 1960]
 

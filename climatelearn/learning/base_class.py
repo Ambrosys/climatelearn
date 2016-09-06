@@ -1,7 +1,60 @@
 import pandas as pd
+from sklearn.metrics import r2_score
+from sklearn.base import BaseEstimator
+import logging
 
 
-class Regression:
+
+class RegressionModel(object):
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+
+    def fit(self, xfit, yfit, **kwargs):
+        """
+        This method is used to train the model given the regression task
+
+        :param xfit: input data matrix for fitting
+        :type xfit: np.ndarray of size (number_of_input_points, number_of_features)
+        :param yfit: target data vector for fitting
+        :type yfit: np.ndarray of size (number_of_input_points)
+        :return: Self.
+        """
+
+    def score(self, xscore, yscore):
+        """
+        Validates/Calculates the score of the hypothesis by calculating the rmse (or some other cost function).
+
+        :param xscore: input data matrix for scoring
+        :param yscore: target data vector for scoring
+        :return: RMSE.
+        """
+        yhat = self.func(xscore)
+        return r2_score(yhat, yscore)
+
+    def predict(self, xpred):
+        """
+        Use the fitted model f to make a prediction.
+
+        .. math::
+            \hat{y}_{pred} = f(x_{pred})
+
+        :param xpred: input data matrix for scoring
+        :return: ypred, predicted target data vector
+        """
+        return self.func(xpred)
+
+
+
+
+
+
+
+
+
+
+
+
+class Regression(object):
     def __init__(self, data, hyper,  n_targets=None, label_targets=None):
         """
         Initialize  the regression model.
@@ -66,7 +119,7 @@ class Regression:
         return train, validation
 
 
-class Classification:
+class Classification(object):
     def __init__(self, data, hyper, n_targets=None, label_targets=None):
         """
         Initialize  the regression model.

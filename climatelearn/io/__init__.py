@@ -1,1 +1,1 @@
-import klimalearn.io.read
+import climatelearn.io.read
