@@ -1,6 +1,7 @@
 import unittest
 from pickle import loads, dumps
 import numpy as np
+import logging
 from climatelearn.learning.regression.keras_ANN import KerasRegressionModel
 
 
@@ -8,6 +9,9 @@ class TestRead(unittest.TestCase):
     def test_Keras_RegressionModel(self):
         x = np.linspace(0, 1, 100)
         y = 2 * x
+        logger = logging.getLogger()
+        logging.basicConfig(level=logging.INFO, format='%(message)s')
+        logger.info("start")
         model = KerasRegressionModel(arity=1, network_structure=(5, 1)).fit(x, y)
 
         weights = model.weights

@@ -101,12 +101,6 @@ class KerasRegressionModel(RegressionModel):
         if self.batch_normalization:
             self.__model.add(BatchNormalization())
 
-    #@property
-    #def callbacks(self):
-    #    cbs = [EpochLogger(self.logger)]
-    #    if self.early_stopping:
-    #        cbs += [EarlyStopping(monitor='val_loss', patience=2)]
-    #    return cbs
 
     @property
     def weights(self):

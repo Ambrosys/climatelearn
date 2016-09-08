@@ -2,15 +2,18 @@ import pandas as pd
 import numpy as np
 
 
-def regression_set(df, target_key, t0, horizon, deltat):
+def regression_set(df, target_key, initial_time, horizon, deltat=0):
     n_horizon = _calc_horizon(df.index, horizon)
     n_deltat = _calc_horizon(df.index, deltat)
-    #Allow the shift also for other keys than the only target key
+
     for n in range(n_deltat):
         df = _shift_features(df, target_key, n+1)
     df = _shift_features(df, key=target_key, shift=-n_horizon, target=True)
-    df = df[df.index >= t0]
-    return df
+    df = df[df.index >= initial_time]
+
+    y = np.array(df[target_key + '_tau'])
+    X = np.asmatrix(df.drop(target_key + '_tau', axis=1))
+    return X, y
 
 
 def classification_set(df, target_key, t0, horizon, deltat, nominal=True):
@@ -19,9 +22,13 @@ def classification_set(df, target_key, t0, horizon, deltat, nominal=True):
     for n in range(n_deltat):
         df = _shift_features(df, target_key, n+1)
     df = _shift_features(df, key=target_key, shift=-n_horizon, target=True)
-    df = el_nino_class(df, target_key + '_tau', nominal=nominal)
+    df = classification_feature(df, target_key + '_tau', nominal=nominal)
     df = df[df.index >= t0]
-    return df
+
+    y = np.array(df[target_key + '_tau'])
+    X = np.asmatrix(df.drop(target_key + '_tau', axis=1))
+    return X, y
+
 
 def _shift_features(df, key, shift, target=False):
     if target:
@@ -39,9 +46,9 @@ def _calc_horizon(index, horizon):
             return i
 
 
-def el_nino_class(df, key, width=0.417, threshold=0.5, nominal=False, drop_key=True):
+def classification_feature(df, key, width=0.417, threshold=0.5, nominal=False, drop_key=True):
     """
-    Creates a classification of events based on the duration of an event.
+    Creates a classification of events based on the behavior of one of the features.
 
     df: Pandas Dataframe
         The dataframe of the data without classification index
@@ -60,9 +67,8 @@ def el_nino_class(df, key, width=0.417, threshold=0.5, nominal=False, drop_key=T
 
     """
     classification_list = np.array([])
-    fine = 0
     k = 0
-    while fine == 0:
+    while True:
         for i in range(k, len(df)):
             if df[key][df.index[i]] >= threshold:
                 begin = i
@@ -83,11 +89,11 @@ def el_nino_class(df, key, width=0.417, threshold=0.5, nominal=False, drop_key=T
                 classification_list = np.append(classification_list, 'no' if nominal else int(0))
         k = end + 1
         if end == len(df) -1:
-            fine = 1
+            break
         if begin > end:
-            fine = 1
             for i in range(k, len(df)):
                 classification_list = np.append(classification_list, 'no' if nominal else int(0))
+            break
     df[key + '_class'] = pd.Series(classification_list, index=df.index)
     if drop_key:
         del df[key]
